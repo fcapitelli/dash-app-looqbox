@@ -18,19 +18,6 @@ for i in range(len(arrGenre)-1):
     temp = arrGenre[i].split(sep=",")
     for j in range(len(temp)-1):
         genreSet.add(temp[j])
-#        
-genreAmount = []
-genreRating = []
-genreMetascore = []
-genreRevenue = []
-for genre in genreSet:
-    genreAmount.append(dfIMDB["Genre"].str.count(genre).sum())
-    genreRating.append(dfIMDB["Rating"].loc[dfIMDB["Genre"].str.contains(genre)].mean())
-    genreMetascore.append(dfIMDB["Metascore"].loc[dfIMDB["Genre"].str.contains(genre)].mean())
-    genreRevenue.append(dfIMDB["RevenueMillions"].loc[dfIMDB["Genre"].str.contains(genre)].sum())
-dfGenre = pd.DataFrame(list(zip(genreSet, genreAmount, genreRating, genreMetascore, genreRevenue)), columns =["Genre", "Total", "Avg_Rating", "Avg_Metascore", "Total_RevenueMillions"])
-dfGenre.sort_values(by="Total", ascending=False, inplace=True)
-dfGenre.reset_index(drop=True)
 #
 yearList = dfIMDB["Year"].unique()
 yearList.sort()
@@ -57,7 +44,7 @@ dfGenreByYear.dropna(inplace=True)
 
 # Create a dash application
 app = dash.Dash(__name__)
-#server = app.server
+server = app.server
 
 # Create an app layout
 app.layout = html.Div(style={'font-family': 'sans-serif'}, children=[html.H1('Looqbox Data Challenge Dashboard',
