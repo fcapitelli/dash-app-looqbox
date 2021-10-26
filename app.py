@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 # Read the airline data into pandas dataframe
 dfIMDB = pd.read_csv("imdb-data.csv")
 
+# Filtering genre
 arrGenre = dfIMDB["Genre"].unique()
 
 # Creating a genre list
@@ -18,7 +19,8 @@ for i in range(len(arrGenre)-1):
     temp = arrGenre[i].split(sep=",")
     for j in range(len(temp)-1):
         genreSet.add(temp[j])
-#
+        
+# Creating main dataframe
 yearList = dfIMDB["Year"].unique()
 yearList.sort()
 genreYear = []
@@ -34,13 +36,9 @@ for year in yearList:
         genreAmount.append(dfIMDB["Genre"].loc[dfIMDB["Year"] == year].str.count(genre).sum())
         genreRating.append(dfIMDB["Rating"].loc[(dfIMDB["Year"] == year) & (dfIMDB["Genre"].str.contains(genre))].mean())
         genreMetascore.append(dfIMDB["Metascore"].loc[(dfIMDB["Year"] == year) & (dfIMDB["Genre"].str.contains(genre))].mean())
-        genreRevenue.append(dfIMDB["RevenueMillions"].loc[(dfIMDB["Year"] == year) & (dfIMDB["Genre"].str.contains(genre))].mean())
+        genreRevenue.append(dfIMDB["RevenueMillions"].loc[dfIMDB["Year"] == year].loc[dfIMDB["Genre"].str.contains(genre)].sum())
 dfGenreByYear = pd.DataFrame(list(zip(genreYear, genreName, genreAmount, genreRating, genreMetascore, genreRevenue)), columns=["Year", "Genre", "Total", "Avg_Rating", "Avg_Metascore", "Total_RevenueMillions"])
-dfGenreByYear.dropna(inplace=True)
-
-#Color list
-#color_map_list = {"Drama": "#F16F59", "Action": "#27D4A6", "Comedy": "#FFAF73", "Adventure": "#B87BFB", "Thriller": "#3CDAF5", "Crime": "#C1EB93", "Romance": "#FFA15A", "Sci-Fi": "#00CC96", "Horror": "#FED36C", "Mystery": "#FF7DA3", "Fantasy": "#FFA7FF", "Biography": "#19D3F3", "Family": "#FECB52", "Animation": "#265CFF", "History": "#00FF7F", "Music": "#BBBBBB", "Musical": "#CECEBF"}
-#colorlist = ["#F16F59", "#27D4A6", "#FFAF73", "#B87BFB", "#3CDAF5", "#C1EB93", "#FFA15A", "#00CC96", "#FED36C", "#FF7DA3", "#FFA7FF", "#19D3F3", "#FECB52", "#265CFF", "#00FF7F", "#BBBBBB",  "#CECEBF"]          
+dfGenreByYear.dropna(inplace=True)     
 
 # Create a dash application
 app = dash.Dash(__name__)
@@ -50,8 +48,7 @@ server = app.server
 app.layout = html.Div(style={'font-family': 'sans-serif'}, children=[html.H1('Looqbox Data Challenge Dashboard',
                                         style={'textAlign': 'center', 'color': '#503D36',
                                                'font-size': 40, 'font-family': 'sans-serif'}),
-                                # TASK 1: Add a dropdown list to enable Launch Site selection
-                                # The default select value is for ALL sites
+                                # Year dropdown                                     
                                 html.P("Release Year:", style={'font-size':15, 'font-weight': 'bold'}),
                                 dcc.Dropdown(id='year-dropdown',
                                              options=[{'label': 'All Years', 'value': 'ALL'},
@@ -72,20 +69,17 @@ app.layout = html.Div(style={'font-family': 'sans-serif'}, children=[html.H1('Lo
                                              searchable=True
                                              ),
                                 html.Br(),
-
-                                # TASK 2: Add a pie chart to show the total successful launches count for all sites
-                                # If a specific launch site was selected, show the Success vs. Failed counts for the site
+                                # Chart div
                                 html.Div([
                                     html.Div(dcc.Graph(id='genre-pie-chart'), style={'width': '50%'}),
                                     html.Div(dcc.Graph(id='revenue-by-genre-column-chart'), style={'width': '50%'})
                                     ], style={'display': 'flex', 'width':'100% !important'}),
                                 html.Br(),
-                                # TASK 4: Add a scatter chart to show the correlation between payload and launch success
+                                # Chart div
                                 html.Div(dcc.Graph(id='top10-revenue-bar-chart')),
                                 ])
 
-# TASK 2:
-# Add a callback function for `site-dropdown` as input, `success-pie-chart` as output
+# Callback function
 @app.callback([
               Output(component_id='genre-pie-chart', component_property='figure'),
               Output(component_id='revenue-by-genre-column-chart', component_property='figure'),
