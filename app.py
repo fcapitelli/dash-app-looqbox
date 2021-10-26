@@ -45,7 +45,7 @@ app = dash.Dash(__name__)
 server = app.server
 
 # Create an app layout
-app.layout = html.Div(style={'font-family': 'sans-serif'}, children=[html.H1('Looqbox Data Challenge Dashboard',
+app.layout = html.Div(style={'font-family': 'sans-serif'}, children=[html.H1('Looqbox Data Challenge Dashboard (Felipe Capitelli)',
                                         style={'textAlign': 'center', 'color': '#503D36',
                                                'font-size': 40, 'font-family': 'sans-serif'}),
                                 # Year dropdown                                     
